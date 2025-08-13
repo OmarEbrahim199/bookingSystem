@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "booking": "Book Now",
+    "contact": "Contact",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Professional Hair & Barber Services",
+    "subtitle": "Get the perfect haircut from the experts. Book your appointment online today.",
+    "cta": "Book Now"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Professional hair and barber services",
+    "mens_cut": "Men's Haircut",
+    "womens_cut": "Women's Haircut",
+    "beard_trim": "Beard Trim",
+    "styling": "Hair Styling",
+    "coloring": "Hair Coloring",
+    "treatment": "Hair Treatment"
+  },
+  "booking": {
+    "title": "Book Your Appointment",
+    "select_service": "Select service",
+    "select_date": "Select date",
+    "select_time": "Select time",
+    "personal_info": "Personal information",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone number",
+    "notes": "Notes (optional)",
+    "book_appointment": "Book appointment",
+    "success": "Your appointment has been booked!",
+    "cancel": "Cancel",
+    "reschedule": "Reschedule"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "hours": "Opening Hours",
+    "mon_fri": "Monday - Friday: 9:00 AM - 6:00 PM",
+    "sat": "Saturday: 9:00 AM - 4:00 PM",
+    "sun": "Sunday: Closed",
+    "send_message": "Send message"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "bookings": "Bookings",
+    "services": "Services",
+    "settings": "Settings",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}

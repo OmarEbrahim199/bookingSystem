@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "home": "Hjem",
+    "services": "Tjenester",
+    "booking": "Book tid",
+    "contact": "Kontakt",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Professionel frisør & barbering",
+    "subtitle": "Få den perfekte frisure hos eksperterne. Book din tid online i dag.",
+    "cta": "Book Nu"
+  },
+  "services": {
+    "title": "Vores Tjenester",
+    "subtitle": "Professionelle frisør- og barberingtjenester",
+    "mens_cut": "Herreklip",
+    "womens_cut": "Dameklip",
+    "beard_trim": "Skægtrimning",
+    "styling": "Styling",
+    "coloring": "Farvning",
+    "treatment": "Behandling"
+  },
+  "booking": {
+    "title": "Book Din Tid",
+    "select_service": "Vælg tjeneste",
+    "select_date": "Vælg dato",
+    "select_time": "Vælg tidspunkt",
+    "personal_info": "Personlige oplysninger",
+    "name": "Fulde navn",
+    "email": "E-mail",
+    "phone": "Telefonnummer",
+    "notes": "Noter (valgfrit)",
+    "book_appointment": "Book aftale",
+    "success": "Din aftale er booket!",
+    "cancel": "Annuller",
+    "reschedule": "Ombook"
+  },
+  "contact": {
+    "title": "Kontakt Os",
+    "address": "Adresse",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "hours": "Åbningstider",
+    "mon_fri": "Mandag - Fredag: 9:00 - 18:00",
+    "sat": "Lørdag: 9:00 - 16:00",
+    "sun": "Søndag: Lukket",
+    "send_message": "Send besked"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "bookings": "Bookinger",
+    "services": "Tjenester",
+    "settings": "Indstillinger",
+    "login": "Log ind",
+    "logout": "Log ud"
+  },
+  "footer": {
+    "rights": "Alle rettigheder forbeholdes",
+    "privacy": "Privatlivspolitik",
+    "terms": "Vilkår"
+  }
+}

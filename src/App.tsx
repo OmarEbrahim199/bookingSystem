@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -12,6 +13,7 @@ import './i18n';
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <div className="min-h-screen bg-white">
         <Header />
@@ -39,6 +41,7 @@ function App() {
         />
       </div>
     </Router>
+    </AuthProvider>
   );
 }
 

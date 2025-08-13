@@ -2,66 +2,79 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Users, Settings, BarChart, Clock, Star, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
-
-interface Booking {
-  id: string;
-  service: string;
-  date: string;
-  time: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  status: 'confirmed' | 'pending' | 'cancelled';
-  price: string;
-}
+import { getBookings, updateBookingStatus, Booking } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import AdminLogin from './AdminLogin';
+import BarberManagement from './BarberManagement';
+import toast from 'react-hot-toast';
 
 const Admin: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { user, adminUser, loading } = useAuth();
   const isRTL = i18n.language === 'ar';
-
-  // Mock data for demonstration
-  const [bookings] = React.useState<Booking[]>([
-    {
-      id: '1',
-      service: 'mens_cut',
-      date: '2025-01-15',
-      time: '10:00',
-      customerName: 'Lars Nielsen',
-      customerEmail: 'lars@email.com',
-      customerPhone: '+45 12 34 56 78',
-      status: 'confirmed',
-      price: '250 DKK'
-    },
-    {
-      id: '2',
-      service: 'womens_cut',
-      date: '2025-01-15',
-      time: '14:30',
-      customerName: 'Anna Sørensen',
-      customerEmail: 'anna@email.com',
-      customerPhone: '+45 87 65 43 21',
-      status: 'pending',
-      price: '350 DKK'
-    },
-    {
-      id: '3',
-      service: 'beard_trim',
-      date: '2025-01-16',
-      time: '11:00',
-      customerName: 'Ahmed Al-Rashid',
-      customerEmail: 'ahmed@email.com',
-      customerPhone: '+45 11 22 33 44',
-      status: 'confirmed',
-      price: '150 DKK'
-    }
-  ]);
-
+  const [bookings, setBookings] = React.useState<Booking[]>([]);
   const [activeTab, setActiveTab] = React.useState('overview');
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (user && adminUser) {
+      loadBookings();
+    }
+  }, [user, adminUser]);
+
+  const loadBookings = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getBookings();
+      setBookings(data);
+    } catch (error) {
+      toast.error('Failed to load bookings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (bookingId: string, newStatus: Booking['status']) => {
+    try {
+      await updateBookingStatus(bookingId, newStatus);
+      toast.success('Booking status updated');
+      await loadBookings();
+    } catch (error) {
+      toast.error('Failed to update booking status');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!user || !adminUser) {
+    return <AdminLogin onLoginSuccess={() => {}} />;
+  }
 
   const stats = [
-    { icon: Calendar, label: 'Today\'s Bookings', value: '8', color: 'bg-blue-500' },
-    { icon: Users, label: 'Total Customers', value: '247', color: 'bg-green-500' },
-    { icon: DollarSign, label: 'Revenue (Month)', value: '15,420 DKK', color: 'bg-purple-500' },
+    { 
+      icon: Calendar, 
+      label: 'Today\'s Bookings', 
+      value: bookings.filter(b => b.appointment_date === format(new Date(), 'yyyy-MM-dd')).length.toString(), 
+      color: 'bg-blue-500' 
+    },
+    { 
+      icon: Users, 
+      label: 'Pending Bookings', 
+      value: bookings.filter(b => b.status === 'pending').length.toString(), 
+      color: 'bg-yellow-500' 
+    },
+    { 
+      icon: DollarSign, 
+      label: 'Total Bookings', 
+      value: bookings.length.toString(), 
+      color: 'bg-purple-500' 
+    },
     { icon: Star, label: 'Average Rating', value: '4.9', color: 'bg-yellow-500' }
   ];
 
@@ -108,7 +121,7 @@ const Admin: React.FC = () => {
               {[
                 { key: 'overview', label: 'Overview', icon: BarChart },
                 { key: 'bookings', label: t('admin.bookings'), icon: Calendar },
-                { key: 'services', label: t('admin.services'), icon: Settings },
+                { key: 'barbers', label: 'Barbers', icon: Users },
                 { key: 'settings', label: t('admin.settings'), icon: Settings }
               ].map((tab) => (
                 <button
@@ -131,12 +144,22 @@ const Admin: React.FC = () => {
           <div className="p-6">
             {activeTab === 'bookings' && (
               <div>
+              <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-gray-900">Recent Bookings</h2>
                   <button className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">
                     Export Data
                   </button>
                 </div>
+
+                {/* Pending Bookings Alert */}
+                {bookings.filter(b => b.status === 'pending').length > 0 && (
+                  <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-yellow-800 font-medium">
+                      ⚠️ You have {bookings.filter(b => b.status === 'pending').length} pending booking(s) that need confirmation
+                    </p>
+                  </div>
+                )}
 
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -168,19 +191,19 @@ const Admin: React.FC = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
                               <div className="text-sm font-medium text-gray-900">
-                                {booking.customerName}
+                                {booking.customer_name}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {booking.customerEmail}
+                                {booking.customer_email}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {booking.customerPhone}
+                                {booking.customer_phone}
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
-                              {t(`services.${booking.service}`)}
+                              {booking.service?.[`name_${i18n.language}` as keyof typeof booking.service] as string}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -188,7 +211,7 @@ const Admin: React.FC = () => {
                               {format(new Date(booking.date), 'MMM dd, yyyy')}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {booking.time}
+                              {booking.appointment_time}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -197,14 +220,30 @@ const Admin: React.FC = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {booking.price}
+                            {booking.service?.price} DKK
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex space-x-2">
-                              <button className="text-blue-600 hover:text-blue-900">
-                                Edit
-                              </button>
-                              <button className="text-red-600 hover:text-red-900">
+                              {booking.status === 'pending' && (
+                                <button 
+                                  onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                                  className="text-green-600 hover:text-green-900"
+                                >
+                                  Confirm
+                                </button>
+                              )}
+                              {booking.status === 'confirmed' && (
+                                <button 
+                                  onClick={() => handleStatusUpdate(booking.id, 'completed')}
+                                  className="text-blue-600 hover:text-blue-900"
+                                >
+                                  Complete
+                                </button>
+                              )}
+                              <button 
+                                onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                                className="text-red-600 hover:text-red-900"
+                              >
                                 Cancel
                               </button>
                             </div>
@@ -216,6 +255,7 @@ const Admin: React.FC = () => {
                 </div>
               </div>
             )}
+            )}
 
             {activeTab === 'overview' && (
               <div className="grid lg:grid-cols-2 gap-6">
@@ -225,9 +265,9 @@ const Admin: React.FC = () => {
                     {bookings.slice(0, 3).map((booking) => (
                       <div key={booking.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
-                          <p className="font-medium text-gray-900">{booking.time}</p>
-                          <p className="text-sm text-gray-600">{booking.customerName}</p>
-                          <p className="text-xs text-gray-500">{t(`services.${booking.service}`)}</p>
+                          <p className="font-medium text-gray-900">{booking.appointment_time}</p>
+                          <p className="text-sm text-gray-600">{booking.customer_name}</p>
+                          <p className="text-xs text-gray-500">{booking.service?.[`name_${i18n.language}` as keyof typeof booking.service] as string}</p>
                         </div>
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(booking.status)}`}>
                           {booking.status}
@@ -263,7 +303,11 @@ const Admin: React.FC = () => {
               </div>
             )}
 
-            {(activeTab === 'services' || activeTab === 'settings') && (
+            {activeTab === 'barbers' && (
+              <BarberManagement />
+            )}
+
+            {activeTab === 'settings' && (
               <div className="text-center py-12">
                 <div className="text-gray-400 mb-4">
                   <Settings className="h-16 w-16 mx-auto" />

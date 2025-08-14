@@ -17,7 +17,7 @@ const schema = yup.object({
 });
 
 interface AdminLoginProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess?: () => void;
 }
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
@@ -33,7 +33,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
     try {
       await signInAdmin(data.email, data.password);
       toast.success('Welcome back!');
-      onLoginSuccess();
+      if (onLoginSuccess) onLoginSuccess();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Login failed');
     } finally {

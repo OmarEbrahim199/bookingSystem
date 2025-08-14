@@ -1,5 +1,5 @@
 import React from 'react';
-import Admin from '../components/AdminLogin';
+import AdminLogin from '../components/AdminLogin';
 
 const AdminPage: React.FC = () => {
   return (

@@ -79,11 +79,16 @@ export const signInAdmin = async (email: string, password: string) => {
     .from('admin_users')
     .select('*')
     .eq('id', data.user.id)
-    .single();
+    .maybeSingle();
     
   if (adminError) {
+    await supabase.auth.signOut();
+    throw new Error(`Database error: ${adminError.message}`);
+  }
+  
+  if (!adminUser) {
     // If admin user doesn't exist and this is the demo email, create one
-    if (adminError.code === 'PGRST116') {
+    if (email === 'admin@barberpro.dk') {
       const { data: newAdmin, error: createError } = await supabase
         .from('admin_users')
         .insert([{
@@ -105,7 +110,7 @@ export const signInAdmin = async (email: string, password: string) => {
     }
     
     await supabase.auth.signOut();
-    throw new Error(`Access denied. Admin privileges required. Error: ${adminError.message}`);
+    throw new Error('Access denied. Admin privileges required.');
   }
   
   if (!adminUser.is_active) {
@@ -130,7 +135,7 @@ export const getCurrentAdmin = async () => {
     .from('admin_users')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
     
   if (error || !adminUser || !adminUser.is_active) return null;
   

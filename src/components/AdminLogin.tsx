@@ -132,7 +132,10 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
             <p className="text-sm text-amber-800 font-medium mb-2">Demo Credentials:</p>
             <p className="text-xs text-amber-700">
               Email: admin@barberpro.dk<br />
-              Password: admin123
+              Password: admin123<br />
+              <span className="text-xs text-amber-600 mt-1 block">
+                Note: Create this user in Supabase Auth first
+              </span>
             </p>
           </div>
         </div>

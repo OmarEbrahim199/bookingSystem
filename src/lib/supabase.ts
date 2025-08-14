@@ -74,7 +74,7 @@ export const signInAdmin = async (email: string, password: string) => {
   
   if (error) throw error;
   
-  // Check if user is an admin - simplified query to avoid RLS issues
+  // Check if user is an admin
   const { data: adminUser, error: adminError } = await supabase
     .from('admin_users')
     .select('*')
@@ -82,14 +82,14 @@ export const signInAdmin = async (email: string, password: string) => {
     .single();
     
   if (adminError) {
-    // If admin user doesn't exist, create one for the demo
-    if (adminError.code === 'PGRST116' && email === 'admin@barberpro.dk') {
+    // If admin user doesn't exist and this is the demo email, create one
+    if (adminError.code === 'PGRST116') {
       const { data: newAdmin, error: createError } = await supabase
         .from('admin_users')
         .insert([{
           id: data.user.id,
           email: email,
-          full_name: 'Admin User',
+          full_name: email === 'admin@barberpro.dk' ? 'Demo Admin' : 'Admin User',
           role: 'super_admin',
           is_active: true
         }])
@@ -98,14 +98,14 @@ export const signInAdmin = async (email: string, password: string) => {
         
       if (createError) {
         await supabase.auth.signOut();
-        throw new Error('Failed to create admin profile.');
+        throw new Error(`Failed to create admin profile: ${createError.message}`);
       }
       
       return { user: data.user, adminUser: newAdmin };
     }
     
     await supabase.auth.signOut();
-    throw new Error('Access denied. Admin privileges required.');
+    throw new Error(`Access denied. Admin privileges required. Error: ${adminError.message}`);
   }
   
   if (!adminUser.is_active) {
